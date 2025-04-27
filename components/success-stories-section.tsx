@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import SuccessStoryCard from "@/components/success-story-card"
@@ -10,18 +10,29 @@ import Link from "next/link"
 export default function SuccessStoriesSection() {
   const featuredStories = getFeaturedSuccessStories()
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [visibleCount, setVisibleCount] = useState(1)
 
-  // Number of stories to show based on screen size
-  const getVisibleCount = () => {
-    if (typeof window !== "undefined") {
-      if (window.innerWidth >= 1024) return 3
-      if (window.innerWidth >= 768) return 2
-      return 1
+  useEffect(() => {
+    const updateVisibleCount = () => {
+      if (window.innerWidth >= 1024) {
+        setVisibleCount(3)
+      } else if (window.innerWidth >= 768) {
+        setVisibleCount(2)
+      } else {
+        setVisibleCount(1)
+      }
     }
-    return 1
-  }
 
-  const visibleCount = typeof window !== "undefined" ? getVisibleCount() : 1
+    // Initial update
+    updateVisibleCount()
+
+    // Add event listener for window resize
+    window.addEventListener('resize', updateVisibleCount)
+
+    // Cleanup
+    return () => window.removeEventListener('resize', updateVisibleCount)
+  }, [])
+
   const maxIndex = Math.max(0, featuredStories.length - visibleCount)
 
   const nextSlide = () => {
