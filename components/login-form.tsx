@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, Loader2 } from "lucide-react"
 import { SocialLoginButtons } from "@/components/social-login-buttons"
+import { supabase } from "@/lib/supabase"
 
 // Form validation schema
 const loginSchema = z.object({
@@ -47,16 +48,17 @@ export default function LoginForm() {
     setError(null)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      })
 
-      // For demo purposes, we'll just log the data and redirect
-      console.log("Login data:", data)
+      if (error) throw error
 
       // Redirect to dashboard after successful login
       router.push("/dashboard")
     } catch (err) {
-      setError("Invalid email or password. Please try again.")
+      setError(err instanceof Error ? err.message : "Invalid email or password. Please try again.")
     } finally {
       setIsLoading(false)
     }

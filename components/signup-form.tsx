@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, Loader2 } from "lucide-react"
 import { SocialLoginButtons } from "@/components/social-login-buttons"
+import { supabase } from "@/lib/supabase"
 
 // Form validation schema
 const signupSchema = z.object({
@@ -25,8 +26,8 @@ const signupSchema = z.object({
     .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
     .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
     .regex(/[0-9]/, { message: "Password must contain at least one number" }),
-  termsAccepted: z.literal(true, {
-    errorMap: () => ({ message: "You must accept the terms and conditions" }),
+  termsAccepted: z.boolean().refine((val) => val === true, {
+    message: "You must accept the terms and conditions",
   }),
 })
 
@@ -56,16 +57,22 @@ export default function SignupForm() {
     setError(null)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const { error: signUpError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            name: data.name,
+          },
+        },
+      })
 
-      // For demo purposes, we'll just log the data and redirect
-      console.log("Signup data:", data)
+      if (signUpError) throw signUpError
 
       // Redirect to onboarding after successful signup
       router.push("/onboarding")
     } catch (err) {
-      setError("An error occurred during signup. Please try again.")
+      setError(err instanceof Error ? err.message : "An error occurred during signup. Please try again.")
     } finally {
       setIsLoading(false)
     }
