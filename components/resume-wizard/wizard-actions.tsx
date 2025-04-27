@@ -11,6 +11,39 @@ export default function WizardActions() {
   const { toast } = useToast()
   const [canContinue, setCanContinue] = useState(isStepComplete(currentStep))
 
+  // Add keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle keyboard navigation when not in an input, textarea, or button
+      if (
+        document.activeElement instanceof HTMLInputElement ||
+        document.activeElement instanceof HTMLTextAreaElement ||
+        document.activeElement instanceof HTMLButtonElement
+      ) {
+        return
+      }
+
+      // Arrow right or Alt+Right to go to next step
+      if ((e.key === "ArrowRight" && e.altKey) || e.key === "PageDown") {
+        if (canContinue && currentStep < 8) {
+          e.preventDefault()
+          nextStep()
+        }
+      }
+
+      // Arrow left or Alt+Left to go to previous step
+      if ((e.key === "ArrowLeft" && e.altKey) || e.key === "PageUp") {
+        if (currentStep > 1) {
+          e.preventDefault()
+          prevStep()
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [canContinue, currentStep, nextStep, prevStep])
+
   // Update canContinue whenever resumeData or currentStep changes
   useEffect(() => {
     // Force a re-check of step completion status
@@ -50,7 +83,7 @@ export default function WizardActions() {
     <div className="flex justify-between">
       <div>
         {currentStep > 1 && (
-          <Button variant="outline" onClick={prevStep} className="flex items-center">
+          <Button variant="outline" onClick={prevStep} className="flex items-center" aria-label="Go to previous step">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
@@ -58,7 +91,12 @@ export default function WizardActions() {
       </div>
 
       <div className="flex space-x-3">
-        <Button variant="outline" onClick={handleSaveAndExit} className="flex items-center">
+        <Button
+          variant="outline"
+          onClick={handleSaveAndExit}
+          className="flex items-center"
+          aria-label="Save resume as draft"
+        >
           <Save className="mr-2 h-4 w-4" />
           Save as Draft
         </Button>
@@ -68,12 +106,17 @@ export default function WizardActions() {
             onClick={nextStep}
             disabled={!canContinue}
             className="bg-brand-600 hover:bg-brand-700 flex items-center"
+            aria-label="Continue to next step"
           >
             Continue
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         ) : (
-          <Button onClick={handleFinish} className="bg-brand-600 hover:bg-brand-700 flex items-center">
+          <Button
+            onClick={handleFinish}
+            className="bg-brand-600 hover:bg-brand-700 flex items-center"
+            aria-label="Generate final resume"
+          >
             Generate Resume
             <Download className="ml-2 h-4 w-4" />
           </Button>

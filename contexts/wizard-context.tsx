@@ -1,7 +1,8 @@
 "use client"
 
 import type React from "react"
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { saveResumeData, getResumeData } from "@/lib/resume-storage"
 
 // Define types for our resume data
 export type PersonalInfo = {
@@ -107,6 +108,7 @@ type WizardContextType = {
   goToStep: (step: number) => void
   isStepComplete: (step: number) => boolean
   canProceed: () => boolean
+  isLoading: boolean
 }
 
 // Create the context with a default value
@@ -139,6 +141,62 @@ const initialResumeData: ResumeData = {
 export const WizardProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentStep, setCurrentStep] = useState(1)
   const [resumeData, setResumeData] = useState<ResumeData>(initialResumeData)
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Load saved data on initial render
+  useEffect(() => {
+    const { data } = getResumeData()
+    if (data) {
+      setResumeData(data)
+
+      // Find the furthest completed step to allow continuing
+      let furthestCompletedStep = 1
+      for (let i = 1; i <= 8; i++) {
+        if (isStepCompleteWithData(i, data)) {
+          furthestCompletedStep = i
+        } else {
+          break
+        }
+      }
+
+      // Set current step to the next incomplete step or the last step if all complete
+      setCurrentStep(Math.min(furthestCompletedStep + 1, 8))
+    }
+    setIsLoading(false)
+  }, [])
+
+  // Save data when it changes
+  useEffect(() => {
+    if (!isLoading) {
+      saveResumeData(resumeData)
+    }
+  }, [resumeData, isLoading])
+
+  // Helper function to check step completion with specific data
+  const isStepCompleteWithData = (step: number, data: ResumeData): boolean => {
+    // Implementation similar to isStepComplete but using the provided data
+    switch (step) {
+      case 1: // Template Selection
+        return !!data.template
+      case 2: // Personal Information
+        const { firstName, lastName, email, phone, location } = data.personalInfo
+        return !!firstName && !!lastName && !!email && !!phone && !!location
+      case 3: // Summary
+        return !!data.summary && data.summary.trim().length > 0
+      case 4: // Experience
+        return Array.isArray(data.experiences) && data.experiences.length > 0
+      case 5: // Education
+        return Array.isArray(data.education) && data.education.length > 0
+      case 6: // Skills
+        return Array.isArray(data.skills) && data.skills.length > 0
+      case 7: // Optional Sections
+        return true // Always complete as it's optional
+      case 8: // Review
+        return true // Always complete as it's just a review
+      default:
+        return false
+    }
+  }
 
   // Update the entire resume data or parts of it
   const updateResumeData = (data: Partial<ResumeData>) => {
@@ -284,33 +342,7 @@ export const WizardProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
   // Check if a step is complete
   const isStepComplete = (step: number): boolean => {
-    switch (step) {
-      case 1: // Template Selection
-        return !!resumeData.template
-      case 2: // Personal Information
-        const { firstName, lastName, email, phone, location } = resumeData.personalInfo
-        // Check each required field individually
-        const hasFirstName = !!firstName && firstName.trim() !== ""
-        const hasLastName = !!lastName && lastName.trim() !== ""
-        const hasEmail = !!email && email.trim() !== ""
-        const hasPhone = !!phone && phone.trim() !== ""
-        const hasLocation = !!location && location.trim() !== ""
-        return hasFirstName && hasLastName && hasEmail && hasPhone && hasLocation
-      case 3: // Summary
-        return !!resumeData.summary && resumeData.summary.trim().length > 0
-      case 4: // Experience
-        return Array.isArray(resumeData.experiences) && resumeData.experiences.length > 0
-      case 5: // Education
-        return Array.isArray(resumeData.education) && resumeData.education.length > 0
-      case 6: // Skills
-        return Array.isArray(resumeData.skills) && resumeData.skills.length > 0
-      case 7: // Optional Sections
-        return true // Always complete as it's optional
-      case 8: // Review
-        return true // Always complete as it's just a review
-      default:
-        return false
-    }
+    return isStepCompleteWithData(step, resumeData)
   }
 
   // Add a function to check if the current step can proceed
@@ -346,6 +378,7 @@ export const WizardProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         goToStep,
         isStepComplete,
         canProceed,
+        isLoading,
       }}
     >
       {children}

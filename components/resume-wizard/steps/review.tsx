@@ -7,6 +7,8 @@ import { CheckCircle, AlertCircle, Download, Pencil, Building, Calendar, MapPin,
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/hooks/use-toast"
+import OptimizedImage from "@/components/optimized-image"
+import { images } from "@/lib/image-assets"
 
 export default function Review() {
   const { resumeData, goToStep, isStepComplete } = useWizard()
@@ -325,11 +327,7 @@ export default function Review() {
             </CardHeader>
             <CardContent className="flex justify-center">
               <div className="border rounded-md w-full max-w-[300px] overflow-hidden">
-                <img
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/at98cv-NcSIoDIgOvScjOdpGgwm2of0ng0VnO.jpeg"
-                  alt="Resume preview"
-                  className="w-full h-auto"
-                />
+                <OptimizedImage src={images.resumeTemplate} alt="Resume preview" className="w-full h-auto" />
                 <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-lg shadow-lg">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-green-500" />

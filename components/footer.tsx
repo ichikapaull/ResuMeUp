@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Facebook, Twitter, Instagram, Linkedin, Github } from "lucide-react"
+import OptimizedImage from "@/components/optimized-image"
 
 export default function Footer() {
   return (
@@ -13,22 +14,13 @@ export default function Footer() {
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
             <div className="flex items-center gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-6 w-6 text-brand-600"
-              >
-                <path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h1" />
-                <path d="M17 3h1a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1" />
-                <path d="M8 13v-2" />
-                <path d="M16 13v-2" />
-                <path d="M8 21v-8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v8" />
-              </svg>
+              <OptimizedImage
+                src="/images/brand/logo.png"
+                alt="ResuMeUp Logo"
+                width={40}
+                height={40}
+                className="h-10 w-10"
+              />
               <span className="font-bold text-xl text-brand-700">ResuMeUp</span>
             </div>
             <p className="text-base text-gray-500">

@@ -5,6 +5,9 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import OptimizedImage from "@/components/optimized-image"
+import { cn } from "@/lib/utils"
+import { usePathname } from "next/navigation"
 
 // Navigation items for the header
 const navItems = [
@@ -18,6 +21,7 @@ const navItems = [
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
+  const pathname = usePathname()
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -25,43 +29,71 @@ export default function Header() {
         {/* Logo and brand name */}
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center space-x-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-6 w-6 text-brand-600"
-            >
-              <path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h1" />
-              <path d="M17 3h1a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1" />
-              <path d="M8 13v-2" />
-              <path d="M16 13v-2" />
-              <path d="M8 21v-8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v8" />
-            </svg>
+            <OptimizedImage
+              src="/images/brand/logo.png"
+              alt="ResuMeUp Logo"
+              width={40}
+              height={40}
+              className="h-10 w-10"
+            />
             <span className="font-bold text-xl text-brand-700">ResuMeUp</span>
           </Link>
         </div>
 
         {/* Desktop navigation */}
         {isDesktop ? (
-          <nav className="flex items-center gap-6">
-            <ul className="flex items-center gap-6">
-              {navItems.map((item) => (
-                <li key={item.name}>
-                  <Link href={item.href} className="text-sm font-medium transition-colors hover:text-brand-600">
-                    {item.name}
+          <nav className="flex items-center">
+            {/* Main navigation links */}
+            <div className="mr-8 border-r pr-6">
+              <ul className="flex items-center space-x-8">
+                {navItems.map((item) => (
+                  <li key={item.name}>
+                    <Link
+                      href={item.href}
+                      className={cn(
+                        "text-sm font-medium transition-colors relative group",
+                        pathname === item.href
+                          ? "text-brand-600 font-semibold"
+                          : "text-muted-foreground hover:text-brand-600",
+                      )}
+                    >
+                      {item.name}
+                      <span className="absolute -bottom-1 left-0 h-0.5 bg-brand-600 w-0 group-hover:w-full transition-all duration-200"></span>
+                    </Link>
+                  </li>
+                ))}
+                <li>
+                  <Link
+                    href="/success-stories"
+                    className={cn(
+                      "text-sm font-medium transition-colors relative group",
+                      pathname === "/success-stories"
+                        ? "text-brand-600 font-semibold"
+                        : "text-muted-foreground hover:text-brand-600",
+                    )}
+                  >
+                    Success Stories
+                    <span className="absolute -bottom-1 left-0 h-0.5 bg-brand-600 w-0 group-hover:w-full transition-all duration-200"></span>
                   </Link>
                 </li>
-              ))}
-            </ul>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" asChild>
+              </ul>
+            </div>
+
+            {/* Authentication buttons */}
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="hover:bg-gray-100 hover:text-brand-600 transition-colors"
+                asChild
+              >
                 <Link href="/login">Log in</Link>
               </Button>
-              <Button size="sm" className="bg-brand-600 hover:bg-brand-700" asChild>
+              <Button
+                size="sm"
+                className="bg-brand-600 hover:bg-brand-700 shadow-sm hover:shadow transition-all"
+                asChild
+              >
                 <Link href="/signup">Sign up</Link>
               </Button>
             </div>

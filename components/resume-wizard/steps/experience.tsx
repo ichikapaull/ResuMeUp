@@ -55,6 +55,46 @@ export default function Experience() {
 
   // Reset form when editing state changes
   useEffect(() => {
+    // Autosave form data when component unmounts or when form values change significantly
+    const subscription = form.watch((value, { name, type }) => {
+      // Only save on significant changes to reduce unnecessary operations
+      if (type === "change" && ["jobTitle", "companyName", "responsibilities"].includes(name || "")) {
+        // Save to local storage as backup
+        localStorage.setItem("resumeup_experience_draft", JSON.stringify(value))
+      }
+    })
+
+    // Check for saved draft when component mounts
+    const savedDraft = localStorage.getItem("resumeup_experience_draft")
+    if (savedDraft && !editingId && !isAdding) {
+      try {
+        const parsedDraft = JSON.parse(savedDraft)
+        // Show recovery option
+        toast({
+          title: "Draft found",
+          description: "Would you like to recover your previous work?",
+          action: (
+            <Button
+              variant="outline"
+              onClick={() => {
+                form.reset(parsedDraft)
+                setIsAdding(true)
+                localStorage.removeItem("resumeup_experience_draft")
+              }}
+            >
+              Recover
+            </Button>
+          ),
+        })
+      } catch (e) {
+        console.error("Error parsing saved draft:", e)
+      }
+    }
+
+    return () => subscription.unsubscribe()
+  }, [form, editingId, isAdding, toast])
+
+  useEffect(() => {
     if (!isAdding) {
       resetForm()
     }

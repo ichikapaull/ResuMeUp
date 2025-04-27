@@ -5,49 +5,64 @@ import { WizardProvider } from "@/contexts/wizard-context"
 import WizardNavigation from "@/components/resume-wizard/wizard-navigation"
 import WizardContent from "@/components/resume-wizard/wizard-content"
 import WizardActions from "@/components/resume-wizard/wizard-actions"
+import LivePreviewPanel from "@/components/resume-wizard/live-preview-panel"
 import { Card } from "@/components/ui/card"
 import { Lightbulb } from "lucide-react"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import ContextualHelp from "@/components/contextual-help"
+import { useMediaQuery } from "@/hooks/use-media-query"
 
 export default function WizardContainer() {
   const [tipsOpen, setTipsOpen] = useState(false)
+  const isDesktop = useMediaQuery("(min-width: 1024px)")
 
   return (
     <WizardProvider>
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold tracking-tight mb-2">Resume Builder</h1>
           <p className="text-muted-foreground">Create a professional, ATS-optimized resume in minutes</p>
         </div>
 
-        <Card className="p-6 shadow-lg overflow-hidden">
-          <div className="flex flex-col">
-            <div className="mb-6">
-              <WizardNavigation />
-            </div>
-
-            <div className="mb-8">
-              <WizardContent />
-            </div>
-
-            <div className="mb-4">
-              <Collapsible open={tipsOpen} onOpenChange={setTipsOpen} className="w-full">
-                <div className="flex items-center justify-between">
-                  <CollapsibleTrigger className="flex items-center text-sm text-brand-600 hover:text-brand-700">
-                    <Lightbulb className="h-4 w-4 mr-2" />
-                    <span>{tipsOpen ? "Hide ATS Tips" : "Show ATS Tips"}</span>
-                  </CollapsibleTrigger>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <Card className="p-6 shadow-lg overflow-hidden">
+              <div className="flex flex-col">
+                <div className="mb-6">
+                  <WizardNavigation />
                 </div>
-                <CollapsibleContent className="mt-2 p-4 bg-gray-50 rounded-md text-sm">
-                  <TipsContent />
-                </CollapsibleContent>
-              </Collapsible>
-            </div>
 
-            <WizardActions />
+                <div className="mb-8">
+                  <WizardContent />
+                </div>
+
+                <div className="mb-4">
+                  <Collapsible open={tipsOpen} onOpenChange={setTipsOpen} className="w-full">
+                    <div className="flex items-center justify-between">
+                      <CollapsibleTrigger className="flex items-center text-sm text-brand-600 hover:text-brand-700">
+                        <Lightbulb className="h-4 w-4 mr-2" />
+                        <span>{tipsOpen ? "Hide ATS Tips" : "Show ATS Tips"}</span>
+                      </CollapsibleTrigger>
+                    </div>
+                    <CollapsibleContent className="mt-2 p-4 bg-gray-50 rounded-md text-sm">
+                      <TipsContent />
+                    </CollapsibleContent>
+                  </Collapsible>
+                </div>
+
+                <WizardActions />
+              </div>
+            </Card>
           </div>
-        </Card>
+
+          {isDesktop && (
+            <div className="lg:col-span-1">
+              <LivePreviewPanel />
+            </div>
+          )}
+        </div>
       </div>
+      <ContextualHelp />
     </WizardProvider>
   )
 }

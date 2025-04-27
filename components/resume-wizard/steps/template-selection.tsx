@@ -7,32 +7,34 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Upload } from "lucide-react"
 import { useState, useEffect } from "react"
+import OptimizedImage from "@/components/optimized-image"
+import { images } from "@/lib/image-assets"
 
-// Template options
+// Template options with real images
 const templates = [
   {
     id: "professional",
     name: "Professional",
     description: "A clean, traditional layout perfect for most industries",
-    image: "/placeholder.svg?height=300&width=220",
+    image: images.templates.professional,
   },
   {
     id: "modern",
     name: "Modern",
     description: "A contemporary design with a fresh look",
-    image: "/placeholder.svg?height=300&width=220",
+    image: images.templates.modern,
   },
   {
     id: "minimal",
     name: "Minimal",
     description: "A simple, straightforward layout that focuses on content",
-    image: "/placeholder.svg?height=300&width=220",
+    image: images.templates.minimal,
   },
   {
     id: "executive",
     name: "Executive",
     description: "An elegant design for senior positions",
-    image: "/placeholder.svg?height=300&width=220",
+    image: images.templates.executive,
   },
 ]
 
@@ -74,10 +76,12 @@ export default function TemplateSelection() {
               >
                 <CardContent className="p-0">
                   <div className="aspect-[3/4] relative">
-                    <img
-                      src={template.image || "/placeholder.svg"}
+                    <OptimizedImage
+                      src={template.image}
                       alt={`${template.name} template preview`}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     />
                     {selectedTemplate === template.id && (
                       <div className="absolute inset-0 bg-brand-600/10 flex items-center justify-center">
