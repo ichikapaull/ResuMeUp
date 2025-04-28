@@ -15,7 +15,7 @@ export default function Footer() {
           <div className="space-y-8 xl:col-span-1">
             <div className="flex items-center gap-2">
               <OptimizedImage
-                src="/images/brand/logo.png"
+                src="/images/brand/logo.svg"
                 alt="ResuMeUp Logo"
                 width={40}
                 height={40}

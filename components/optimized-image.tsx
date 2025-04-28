@@ -65,45 +65,44 @@ export default function OptimizedImage({
     )
   }
 
-  // Handle placeholder SVGs from the previous implementation
-  if (src.includes("/placeholder.svg")) {
-    // Extract dimensions from placeholder URL if they exist
-    const match = src.match(/height=(\d+)&width=(\d+)/)
-    const placeholderHeight = match ? Number.parseInt(match[1]) : height
-    const placeholderWidth = match ? Number.parseInt(match[2]) : width
-
+  // Handle placeholder images
+  if (src.includes('placeholder.com') || src.includes('via.placeholder.com')) {
     return (
       <div
         className={cn(
-          "bg-gray-100 flex items-center justify-center text-gray-400",
-          fill ? "w-full h-full absolute inset-0" : "",
+          "relative overflow-hidden rounded-md",
+          fill ? "w-full h-full" : "",
           className,
         )}
         style={
           !fill
             ? {
-                width: `${placeholderWidth}px`,
-                height: `${placeholderHeight}px`,
+                width: `${width}px`,
+                height: `${height}px`,
               }
             : {}
         }
-        {...props}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-          <circle cx="8.5" cy="8.5" r="1.5" />
-          <polyline points="21 15 16 10 5 21" />
-        </svg>
+        <Image
+          src={src}
+          alt={alt}
+          width={fill ? undefined : width}
+          height={fill ? undefined : height}
+          className={cn(
+            "object-cover",
+            className,
+          )}
+          priority={priority}
+          sizes={sizes}
+          quality={quality}
+          fill={fill}
+          onLoad={(event) => {
+            const target = event.target as HTMLImageElement
+            target.classList.remove("opacity-0")
+            target.classList.add("opacity-100")
+          }}
+          {...props}
+        />
       </div>
     )
   }
@@ -132,14 +131,13 @@ export default function OptimizedImage({
           sizes={sizes}
           quality={quality}
           fill={fill}
-          onLoadingComplete={(image) => {
-            // Add fade-in effect when image loads
-            image.classList.remove("opacity-0")
-            image.classList.add("opacity-100")
-          }}
           onLoad={(event) => {
-            // Remove the loading animation when image loads
+            // Add fade-in effect when image loads
             const target = event.target as HTMLImageElement
+            target.classList.remove("opacity-0")
+            target.classList.add("opacity-100")
+            
+            // Remove the loading animation when image loads
             if (target.parentElement) {
               const loadingEl = target.parentElement.querySelector(".bg-gray-100")
               if (loadingEl) {

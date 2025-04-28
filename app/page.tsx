@@ -89,7 +89,7 @@ export default function Home() {
             <Card className="border-0 shadow-md overflow-hidden">
               <div className="relative h-40">
                 <Image
-                  src="/images/icons/ai-suggestion.png"
+                  src="/images/features/ats-optimized-templates.png"
                   alt="ATS optimization illustration"
                   fill
                   className="object-contain p-4"
@@ -105,7 +105,7 @@ export default function Home() {
             <Card className="border-0 shadow-md overflow-hidden">
               <div className="relative h-40">
                 <Image
-                  src="/images/icons/ai-suggestion.svg"
+                  src="/images/features/ai-suggestion.jpg"
                   alt="AI content suggestions illustration"
                   fill
                   className="object-contain p-4"
@@ -121,7 +121,7 @@ export default function Home() {
             <Card className="border-0 shadow-md overflow-hidden">
               <div className="relative h-40">
                 <Image
-                  src="/images/icons/privacy.svg"
+                  src="/images/features/privacyprotection.png"
                   alt="Privacy protection illustration"
                   fill
                   className="object-contain p-4"

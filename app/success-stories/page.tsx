@@ -87,7 +87,7 @@ export default function SuccessStoriesPage() {
                 <div className="space-y-4">
                   <div className="relative h-40 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform duration-300">
                     <OptimizedImage
-                      src="/images/success-stories/alex-morgan.png"
+                      src="/images/icons/alex-morgan.png"
                       alt="Success story"
                       fill
                       className="object-cover"
@@ -98,7 +98,7 @@ export default function SuccessStoriesPage() {
                   </div>
                   <div className="relative h-60 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform duration-300">
                     <OptimizedImage
-                      src="/images/success-stories/priya-sharma.png"
+                      src="/images/icons/priya-sharma.png"
                       alt="Success story"
                       fill
                       className="object-cover"
@@ -111,7 +111,7 @@ export default function SuccessStoriesPage() {
                 <div className="space-y-4 pt-8">
                   <div className="relative h-60 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform duration-300">
                     <OptimizedImage
-                      src="/images/success-stories/marcus-johnson.png"
+                      src="/images/icons/marcus-johnson.png"
                       alt="Success story"
                       fill
                       className="object-cover"
