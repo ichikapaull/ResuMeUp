@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import { getPlaceholderImage } from "@/lib/image-assets"
 
 interface OptimizedImageProps {
   src?: string
@@ -144,6 +145,11 @@ export default function OptimizedImage({
                 loadingEl.classList.add("opacity-0")
               }
             }
+          }}
+          onError={(event) => {
+            // Replace with placeholder on error
+            const target = event.target as HTMLImageElement
+            target.src = getPlaceholderImage(width || 800, height || 600)
           }}
           {...props}
         />

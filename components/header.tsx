@@ -30,7 +30,7 @@ export default function Header() {
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center space-x-2">
             <OptimizedImage
-              src="/images/brand/logo.png"
+              src="/images/brand/logo.svg"
               alt="ResuMeUp Logo"
               width={40}
               height={40}
