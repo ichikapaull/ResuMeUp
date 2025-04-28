@@ -89,7 +89,7 @@ export default function Home() {
             <Card className="border-0 shadow-md overflow-hidden">
               <div className="relative h-40">
                 <Image
-                  src="/images/icons/ats-check.svg"
+                  src="/images/icons/ai-suggestion.png"
                   alt="ATS optimization illustration"
                   fill
                   className="object-contain p-4"

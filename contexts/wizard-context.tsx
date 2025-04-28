@@ -85,7 +85,10 @@ export type ResumeData = {
 type WizardContextType = {
   currentStep: number
   setCurrentStep: (step: number) => void
+  totalSteps: number
   resumeData: ResumeData
+  formData: ResumeData
+  setFormData: (data: ResumeData) => void
   updateResumeData: (data: Partial<ResumeData>) => void
   updatePersonalInfo: (data: Partial<PersonalInfo>) => void
   addExperience: (experience: Experience) => void
@@ -141,13 +144,16 @@ const initialResumeData: ResumeData = {
 export const WizardProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentStep, setCurrentStep] = useState(1)
   const [resumeData, setResumeData] = useState<ResumeData>(initialResumeData)
+  const [formData, setFormData] = useState<ResumeData>(initialResumeData)
   const [isLoading, setIsLoading] = useState(true)
+  const totalSteps = 8
 
   // Load saved data on initial render
   useEffect(() => {
     const { data } = getResumeData()
     if (data) {
       setResumeData(data)
+      setFormData(data)
 
       // Find the furthest completed step to allow continuing
       let furthestCompletedStep = 1
@@ -201,11 +207,16 @@ export const WizardProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   // Update the entire resume data or parts of it
   const updateResumeData = (data: Partial<ResumeData>) => {
     setResumeData((prev) => ({ ...prev, ...data }))
+    setFormData((prev) => ({ ...prev, ...data }))
   }
 
   // Update personal information
   const updatePersonalInfo = (data: Partial<PersonalInfo>) => {
     setResumeData((prev) => ({
+      ...prev,
+      personalInfo: { ...prev.personalInfo, ...data },
+    }))
+    setFormData((prev) => ({
       ...prev,
       personalInfo: { ...prev.personalInfo, ...data },
     }))
@@ -217,6 +228,10 @@ export const WizardProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       ...prev,
       experiences: [...prev.experiences, experience],
     }))
+    setFormData((prev) => ({
+      ...prev,
+      experiences: [...prev.experiences, experience],
+    }))
   }
 
   const updateExperience = (id: string, experience: Partial<Experience>) => {
@@ -224,10 +239,18 @@ export const WizardProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       ...prev,
       experiences: prev.experiences.map((exp) => (exp.id === id ? { ...exp, ...experience } : exp)),
     }))
+    setFormData((prev) => ({
+      ...prev,
+      experiences: prev.experiences.map((exp) => (exp.id === id ? { ...exp, ...experience } : exp)),
+    }))
   }
 
   const removeExperience = (id: string) => {
     setResumeData((prev) => ({
+      ...prev,
+      experiences: prev.experiences.filter((exp) => exp.id !== id),
+    }))
+    setFormData((prev) => ({
       ...prev,
       experiences: prev.experiences.filter((exp) => exp.id !== id),
     }))
@@ -239,6 +262,10 @@ export const WizardProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       ...prev,
       education: [...prev.education, education],
     }))
+    setFormData((prev) => ({
+      ...prev,
+      education: [...prev.education, education],
+    }))
   }
 
   const updateEducation = (id: string, education: Partial<Education>) => {
@@ -246,10 +273,18 @@ export const WizardProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       ...prev,
       education: prev.education.map((edu) => (edu.id === id ? { ...edu, ...education } : edu)),
     }))
+    setFormData((prev) => ({
+      ...prev,
+      education: prev.education.map((edu) => (edu.id === id ? { ...edu, ...education } : edu)),
+    }))
   }
 
   const removeEducation = (id: string) => {
     setResumeData((prev) => ({
+      ...prev,
+      education: prev.education.filter((edu) => edu.id !== id),
+    }))
+    setFormData((prev) => ({
       ...prev,
       education: prev.education.filter((edu) => edu.id !== id),
     }))
@@ -261,6 +296,10 @@ export const WizardProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       ...prev,
       skills: [...prev.skills, skill],
     }))
+    setFormData((prev) => ({
+      ...prev,
+      skills: [...prev.skills, skill],
+    }))
   }
 
   const updateSkill = (id: string, skill: Partial<Skill>) => {
@@ -268,10 +307,18 @@ export const WizardProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       ...prev,
       skills: prev.skills.map((s) => (s.id === id ? { ...s, ...skill } : s)),
     }))
+    setFormData((prev) => ({
+      ...prev,
+      skills: prev.skills.map((s) => (s.id === id ? { ...s, ...skill } : s)),
+    }))
   }
 
   const removeSkill = (id: string) => {
     setResumeData((prev) => ({
+      ...prev,
+      skills: prev.skills.filter((s) => s.id !== id),
+    }))
+    setFormData((prev) => ({
       ...prev,
       skills: prev.skills.filter((s) => s.id !== id),
     }))
@@ -283,6 +330,10 @@ export const WizardProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       ...prev,
       projects: [...prev.projects, project],
     }))
+    setFormData((prev) => ({
+      ...prev,
+      projects: [...prev.projects, project],
+    }))
   }
 
   const updateProject = (id: string, project: Partial<Project>) => {
@@ -290,10 +341,18 @@ export const WizardProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       ...prev,
       projects: prev.projects.map((p) => (p.id === id ? { ...p, ...project } : p)),
     }))
+    setFormData((prev) => ({
+      ...prev,
+      projects: prev.projects.map((p) => (p.id === id ? { ...p, ...project } : p)),
+    }))
   }
 
   const removeProject = (id: string) => {
     setResumeData((prev) => ({
+      ...prev,
+      projects: prev.projects.filter((p) => p.id !== id),
+    }))
+    setFormData((prev) => ({
       ...prev,
       projects: prev.projects.filter((p) => p.id !== id),
     }))
@@ -305,6 +364,10 @@ export const WizardProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       ...prev,
       certifications: [...prev.certifications, certification],
     }))
+    setFormData((prev) => ({
+      ...prev,
+      certifications: [...prev.certifications, certification],
+    }))
   }
 
   const updateCertification = (id: string, certification: Partial<Certification>) => {
@@ -312,10 +375,18 @@ export const WizardProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       ...prev,
       certifications: prev.certifications.map((c) => (c.id === id ? { ...c, ...certification } : c)),
     }))
+    setFormData((prev) => ({
+      ...prev,
+      certifications: prev.certifications.map((c) => (c.id === id ? { ...c, ...certification } : c)),
+    }))
   }
 
   const removeCertification = (id: string) => {
     setResumeData((prev) => ({
+      ...prev,
+      certifications: prev.certifications.filter((c) => c.id !== id),
+    }))
+    setFormData((prev) => ({
       ...prev,
       certifications: prev.certifications.filter((c) => c.id !== id),
     }))
@@ -350,40 +421,39 @@ export const WizardProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     return isStepComplete(currentStep)
   }
 
-  return (
-    <WizardContext.Provider
-      value={{
-        currentStep,
-        setCurrentStep,
-        resumeData,
-        updateResumeData,
-        updatePersonalInfo,
-        addExperience,
-        updateExperience,
-        removeExperience,
-        addEducation,
-        updateEducation,
-        removeEducation,
-        addSkill,
-        updateSkill,
-        removeSkill,
-        addProject,
-        updateProject,
-        removeProject,
-        addCertification,
-        updateCertification,
-        removeCertification,
-        nextStep,
-        prevStep,
-        goToStep,
-        isStepComplete,
-        canProceed,
-        isLoading,
-      }}
-    >
-      {children}
-    </WizardContext.Provider>
-  )
+  const value = {
+    currentStep,
+    setCurrentStep,
+    totalSteps,
+    resumeData,
+    formData,
+    setFormData,
+    updateResumeData,
+    updatePersonalInfo,
+    addExperience,
+    updateExperience,
+    removeExperience,
+    addEducation,
+    updateEducation,
+    removeEducation,
+    addSkill,
+    updateSkill,
+    removeSkill,
+    addProject,
+    updateProject,
+    removeProject,
+    addCertification,
+    updateCertification,
+    removeCertification,
+    nextStep,
+    prevStep,
+    goToStep,
+    isStepComplete,
+    canProceed,
+    isLoading,
+  }
+
+  return <WizardContext.Provider value={value}>{children}</WizardContext.Provider>
 }
 
 // Custom hook to use the wizard context

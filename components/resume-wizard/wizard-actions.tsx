@@ -2,14 +2,29 @@
 
 import { useWizard } from "@/contexts/wizard-context"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, ArrowRight, Save, Download } from "lucide-react"
+import { ArrowLeft, ArrowRight, Save, Download, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useState, useEffect } from "react"
 
-export default function WizardActions() {
-  const { currentStep, nextStep, prevStep, isStepComplete, resumeData } = useWizard()
+interface WizardActionsProps {
+  currentStep: number
+  totalSteps: number
+  onNext: () => void
+  onPrev: () => void
+  formData: any
+  setFormData: (data: any) => void
+}
+
+export function WizardActions({
+  currentStep,
+  totalSteps,
+  onNext,
+  onPrev,
+  formData,
+  setFormData,
+}: WizardActionsProps) {
   const { toast } = useToast()
-  const [canContinue, setCanContinue] = useState(isStepComplete(currentStep))
+  const [isLoading, setIsLoading] = useState(false)
 
   // Add keyboard navigation
   useEffect(() => {
@@ -25,41 +40,24 @@ export default function WizardActions() {
 
       // Arrow right or Alt+Right to go to next step
       if ((e.key === "ArrowRight" && e.altKey) || e.key === "PageDown") {
-        if (canContinue && currentStep < 8) {
+        if (currentStep < totalSteps - 1) {
           e.preventDefault()
-          nextStep()
+          onNext()
         }
       }
 
       // Arrow left or Alt+Left to go to previous step
       if ((e.key === "ArrowLeft" && e.altKey) || e.key === "PageUp") {
-        if (currentStep > 1) {
+        if (currentStep > 0) {
           e.preventDefault()
-          prevStep()
+          onPrev()
         }
       }
     }
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [canContinue, currentStep, nextStep, prevStep])
-
-  // Update canContinue whenever resumeData or currentStep changes
-  useEffect(() => {
-    // Force a re-check of step completion status
-    const isComplete = isStepComplete(currentStep)
-    setCanContinue(isComplete)
-
-    // Set up an interval to check completion status (helps with dynamic form updates)
-    const checkInterval = setInterval(() => {
-      const currentIsComplete = isStepComplete(currentStep)
-      if (currentIsComplete !== canContinue) {
-        setCanContinue(currentIsComplete)
-      }
-    }, 500) // Check every 500ms
-
-    return () => clearInterval(checkInterval)
-  }, [currentStep, isStepComplete, resumeData, canContinue])
+  }, [currentStep, totalSteps, onNext, onPrev])
 
   const handleSaveAndExit = () => {
     // In a real app, this would save the current state to the server or local storage
@@ -69,59 +67,73 @@ export default function WizardActions() {
     })
   }
 
-  const handleFinish = () => {
-    // In a real app, this would finalize the resume and redirect to the dashboard
-    toast({
-      title: "Resume created!",
-      description: "Your resume has been successfully created.",
-    })
-    // Redirect to dashboard or download page
-    window.location.href = "/dashboard"
+  const handleCompleteWithAI = async () => {
+    setIsLoading(true)
+    try {
+      const res = await fetch('/api/ai-complete-resume', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userData: formData }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'AI completion failed')
+      }
+
+      if (data.error) {
+        throw new Error(data.error)
+      }
+
+      // Merge AI results with existing form data
+      setFormData({ ...formData, ...data.aiResult })
+      
+      toast({
+        title: "Success",
+        description: "Your resume has been enhanced with AI suggestions",
+      })
+    } catch (error) {
+      console.error('AI completion error:', error)
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to complete resume with AI. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
-    <div className="flex justify-between">
-      <div>
-        {currentStep > 1 && (
-          <Button variant="outline" onClick={prevStep} className="flex items-center" aria-label="Go to previous step">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+    <div className="flex items-center justify-between mt-6">
+      <div className="flex items-center gap-2">
+        {currentStep > 0 && (
+          <Button variant="outline" onClick={onPrev}>
+            Previous
           </Button>
         )}
-      </div>
-
-      <div className="flex space-x-3">
         <Button
           variant="outline"
-          onClick={handleSaveAndExit}
-          className="flex items-center"
-          aria-label="Save resume as draft"
+          onClick={handleCompleteWithAI}
+          disabled={isLoading}
         >
-          <Save className="mr-2 h-4 w-4" />
-          Save as Draft
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              AI is Enhancing...
+            </>
+          ) : (
+            "Enhance with AI"
+          )}
         </Button>
-
-        {currentStep < 8 ? (
-          <Button
-            onClick={nextStep}
-            disabled={!canContinue}
-            className="bg-brand-600 hover:bg-brand-700 flex items-center"
-            aria-label="Continue to next step"
-          >
-            Continue
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        ) : (
-          <Button
-            onClick={handleFinish}
-            className="bg-brand-600 hover:bg-brand-700 flex items-center"
-            aria-label="Generate final resume"
-          >
-            Generate Resume
-            <Download className="ml-2 h-4 w-4" />
-          </Button>
-        )}
       </div>
+      <Button
+        onClick={onNext}
+        disabled={currentStep === totalSteps - 1}
+      >
+        {currentStep === totalSteps - 1 ? "Finish" : "Next"}
+      </Button>
     </div>
   )
 }
