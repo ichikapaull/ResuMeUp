@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
@@ -214,8 +215,8 @@ export default function PricingComparison() {
             <TableBody>
               {view === "category" ? (
                 features.map((category) => (
-                  <>
-                    <TableRow key={category.category} className="bg-gray-50">
+                  <React.Fragment key={category.category}>
+                    <TableRow className="bg-gray-50">
                       <TableCell colSpan={4} className="font-medium">
                         {category.category}
                       </TableCell>
@@ -244,7 +245,7 @@ export default function PricingComparison() {
                         <TableCell className="text-center">{renderCheckmark(item.enterprise)}</TableCell>
                       </TableRow>
                     ))}
-                  </>
+                  </React.Fragment>
                 ))
               ) : (
                 <>
